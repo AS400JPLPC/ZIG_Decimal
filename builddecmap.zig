@@ -1,5 +1,5 @@
 const std = @import("std");
-
+// version zig = 0.11.0 dev
 
 pub fn build(b: *std.Build) void {
     // Standard release options allow the person running `zig build` to select
