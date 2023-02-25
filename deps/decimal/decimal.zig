@@ -46,7 +46,7 @@ const c = @cImport( { @cInclude("mpdecimal.h"); } );
 ///   subTo: r = a - b
 ///   mulTo: r = a * b
 ///   divto: r = a / b      if b = zeros raises an error
-///   rate: raises a value with the percentage ex ( n = (val*nbr) , val = (n * %1.25
+///   rate: raises a value with the percentage ex ( n = (val*nbr) , val = (n * %1.25)
 /// 
 /// function off DCMLF
 /// mdrate module: returns ex: ttc , htx (base val, article nrb, rate = 25 ) practice in 5 operations
