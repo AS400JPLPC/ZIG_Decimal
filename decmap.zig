@@ -43,7 +43,7 @@ vente.base.assign("45578.85") catch | err | {dcml.dsperr.errorDcml(err); return;
 vente.taxe.assign("1.25") catch | err | {dcml.dsperr.errorDcml(err); return;};
 
 // number of cars sold by the group worldwide
-vente.nbrItem.assign("10000000000") catch | err | {dcml.dsperr.errorDcml(err); return;};
+vente.nbrItem.assign("100000000000") catch | err | {dcml.dsperr.errorDcml(err); return;};
 
 // Total Price excluding tax
 vente.htx.mulTo(vente.base,vente.nbrItem) catch | err | {dcml.dsperr.errorDcml(err); return;};
@@ -52,7 +52,6 @@ std.debug.print("\r\n  Total Price excluding tax {s}\r\n",.{vente.htx.string()})
 // Prices all taxes included
 vente.ttc.rate(vente.base,vente.nbrItem,vente.taxe) catch | err | {dcml.dsperr.errorDcml(err); return;};
 std.debug.print("\r\n  Prices all taxes included {s}\r\n",.{vente.ttc.string()});
-
 
 
 // other calcul
@@ -77,11 +76,15 @@ std.debug.print("\r\n-----------------------------------\r\n",.{});
 dcml.debugContext();
 std.debug.print("\r\nzeros {}\r\n",.{vente.ttc.isZeros()});
 
-var r = dcml.DCMLFX.def(7,3) catch unreachable;
-var t = dcml.DCMLFX.def(12,22) catch unreachable;
+var r = dcml.DCMLFX.def(7,3) catch unreachable;       // set 0 init default
+var t = dcml.DCMLFX.def(12,22) catch unreachable;     // set 0 init default
 dcml.forceAssign(r, "1.7856") catch unreachable;
 r.round();
 r.debugPrint();
+
+var repcmp = dcml.cmp(r,t) catch | err | {dcml.dsperr.errorDcml(err); return;};
+
+if(repcmp == dcml.CMP.GT) std.debug.print("\r\nrepcom =  r > t \r\n",.{});
 
 dcml.forceAssign(r, "1.7856" ) catch unreachable;
 r.trunc();

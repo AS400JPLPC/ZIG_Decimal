@@ -49,6 +49,7 @@ const c = @cImport( { @cInclude("mpdecimal.h"); } );
 ///   rate: raises a value with the percentage ex ( n = (val*nbr) , val = (n * %1.25)
 /// 
 /// function off DCMLF
+/// cmp: compare a , b returns EQ LT GT
 /// mdrate module: returns ex: ttc , htx (base val, article nrb, rate = 25 ) practice in 5 operations
 /// forceAssign: forces the value
 /// dsperr: practical @panic product in test 
@@ -70,7 +71,8 @@ const dcmlError = error {
   isOverflow_scale,
   isOverflow_entier_htx,
   isOverflow_entier_ttc,
-  div_impossible_zeros
+  div_impossible_zeros,
+  cmp_impossible
 };
 
 pub const dcml = struct{
@@ -87,10 +89,11 @@ pub const dcml = struct{
     //--------------------------------------------------------------
     // Definition ex: for management -> accounting, stock, order...
     //--------------------------------------------------------------
-
+    // MPD_DECIMAL32 = 32     MPD_ROUND_HALF_EVEN
+    // MPD_DECIMAL64 = 64     MPD_ROUND_HALF_EVEN   
+    // MPD_DECIMAL128 = 128   MPD_ROUND_HALF_EVEN       
     fn openContext() void {
         c.mpd_maxcontext(@ptrCast([*c]c.mpd_context_t, &CTX_ADDR) ) ;
-        // decimal 128 MPD_ROUND_05UP 	round zero or five away from 0
         _= c.mpd_ieee_context(@ptrCast([*c]c.mpd_context_t, &CTX_ADDR) ,128);
         startContext = true ;
     }
@@ -448,10 +451,39 @@ pub const dcml = struct{
       c.mpd_mul(res.number,res.number, coef.number, &CTX_ADDR);
 
     }
+
+
+
+
+    // compare a , b returns EQ LT GT
+    pub fn cmp(a: DCMLFX ,b: DCMLFX) ! CMP  {
+
+    var rep :  c_int  = c.mpd_cmp(a.number ,b.number, &CTX_ADDR);
+      switch (rep) {
+          -1 => return CMP.LT ,
+          0  => return CMP.EQ ,
+          1  => return CMP.GT ,
+        else => return dcmlError.cmp_impossible,
+      }
+    }
   };
 
+  pub const CMP = enum (i8) {
+          LT = -1 ,
+          EQ = 0  ,
+          GT = 1  ,
+  };
+      // compare a , b returns EQ LT GT
+  pub fn cmp(a: DCMLFX ,b: DCMLFX) ! CMP  {
 
-
+    var rep :  c_int  = c.mpd_cmp(a.number ,b.number, &CTX_ADDR);
+      switch (rep) {
+          -1 => return CMP.LT ,
+          0  => return CMP.EQ ,
+          1  => return CMP.GT ,
+        else => return dcmlError.cmp_impossible,
+      }
+  }
 
   // module rate  htx= (val * nbr) ttc = (htx/∕100) * 25 ) + htx
   pub fn mdrate(resttc: DCMLFX ,reshtx: DCMLFX ,val: DCMLFX ,nbr: DCMLFX, coef:DCMLFX) !void {
