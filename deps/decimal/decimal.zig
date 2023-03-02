@@ -46,6 +46,9 @@ const c = @cImport( { @cInclude("mpdecimal.h"); } );
 ///   subTo: r = a - b
 ///   mulTo: r = a * b
 ///   divto: r = a / b      if b = zeros raises an error
+///   floor: r = a
+///   ceil : r = a
+///   rem  : r = a / b      if b = zeros raises an error
 ///   rate: raises a value with the percentage ex ( n = (val*nbr) , val = (n * %1.25)
 /// 
 /// function off DCMLF
@@ -127,8 +130,9 @@ pub const dcml = struct{
 
 
     // debug dcml number, entier,scale
-    pub fn debugPrint(cnbr: DCMLFX) void {
-      std.debug.print(" dcml:{s} entier:{d} scale:{d}  \r\n", .{
+    pub fn debugPrint(cnbr: DCMLFX, txt : []const u8) void {
+      std.debug.print("debug: {s} --> dcml:{s} entier:{d} scale:{d}  \r\n", .{
+        txt,
         c.mpd_to_eng(cnbr.number, 0), cnbr.entier, cnbr.scale });
     }
 
@@ -434,6 +438,42 @@ pub const dcml = struct{
       if( b.isZeros()) return dcmlError.div_impossible_zeros;
       if( a.isZeros()) {r.setZeros() ; return ;}
       c.mpd_mul(r.number, a.number, b.number, &CTX_ADDR,);
+      r.isOverfow() catch | err | {
+        if (err == dcmlError.isOverflow_entier) return err ;
+      } ;
+    }
+
+
+
+
+    // function Floor
+    pub fn floor(r: DCMLFX ,a: DCMLFX) !void {
+      if( a.isZeros()) {r.setZeros() ; return ;}
+      c.mpd_floor(r.number, a.number,  &CTX_ADDR);
+      r.isOverfow() catch | err | {
+        if (err == dcmlError.isOverflow_entier) return err ;
+      } ;
+    }
+
+
+
+
+    // function ceiling
+    pub fn ceil(r: DCMLFX ,a: DCMLFX) !void {
+      if( a.isZeros()) {r.setZeros() ; return ;}
+      c.mpd_ceil(r.number, a.number,  &CTX_ADDR);
+      r.isOverfow() catch | err | {
+        if (err == dcmlError.isOverflow_entier) return err ;
+      } ;
+    }
+
+
+
+    // function remainder
+    pub fn rem(r: DCMLFX ,a: DCMLFX ,b: DCMLFX) !void {
+      if( b.isZeros()) return dcmlError.div_impossible_zeros;
+      if( a.isZeros()) {r.setZeros() ; return ;}
+      c.mpd_rem(r.number, a.number, b.number, &CTX_ADDR);
       r.isOverfow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;

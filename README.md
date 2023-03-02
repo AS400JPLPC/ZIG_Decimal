@@ -30,6 +30,10 @@ official site thank you for making this standardization available<br>
 ---
 <br>
 &rarr; 2023-02-27 add compare  a, b  =   enum CMP. LT EQ LT<br>
+&rarr; 2023-03-02 add ceil     r = a<br>
+&rarr; 2023-03-02 add rem      r = a / b<br>
+&rarr; 2023-03-02 result alignment with AS400<br>
+&rarr; 2023-03-02 update ebugPrint(cnbr: DCMLFX, txt : []const u8) <br>
 <br>
 &nbsp;&nbsp;&nbsp; CTX_ADDR Communication structure for default common control decimal128 -> MPD_ROUND_HALF_EVEN<br>
 <br>
@@ -86,6 +90,12 @@ official site thank you for making this standardization available<br>
 &nbsp;&nbsp;&nbsp;   mulTo: r = a x b<br>
 <br>
 &nbsp;&nbsp;&nbsp;   divto: r = a / b      if b = zeros raises an error<br>
+<br>
+&nbsp;&nbsp;&nbsp;   floor: r = a<br>
+<br>
+&nbsp;&nbsp;&nbsp;   ceil : r = a<br>
+<br>
+&nbsp;&nbsp;&nbsp;   rem  : r = a / b      if b = zeros raises an error<br>
 <br>
 &nbsp;&nbsp;&nbsp;   rate: raises a value with the percentage ex ( n = (val x nbr) , val = (n x %1.25)<br>
 <br>
