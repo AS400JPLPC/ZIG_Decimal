@@ -192,7 +192,7 @@ pub const dcml = struct{
 
 
     // Validity check Overflow
-    pub fn isOverfow (cnbr: DCMLFX) ! void {
+    pub fn isOverflow (cnbr: DCMLFX) ! void {
       var str = std.mem.span(c.mpd_to_eng(cnbr.number, 0));
 
       var iter = iteratStr.iterator(str);
@@ -352,7 +352,7 @@ pub const dcml = struct{
     pub fn add(a: DCMLFX ,b: DCMLFX) !void {
       if( a.isZeros()) {a.setZeros() ; return ;}
       c.mpd_add(a.number, a.number, b.number, &CTX_ADDR);
-      a.isOverfow() catch | err | {
+      a.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -364,7 +364,7 @@ pub const dcml = struct{
     pub fn addTo(r: DCMLFX , a: DCMLFX ,b: DCMLFX) !void {
       if( a.isZeros()) {r.setZeros() ; return ;}
       c.mpd_add(r.number, a.number, b.number, &CTX_ADDR);
-      r.isOverfow() catch | err | {
+      r.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -376,7 +376,7 @@ pub const dcml = struct{
     pub fn sub(a: DCMLFX ,b: DCMLFX) !void {
       if( a.isZeros()) {a.setZeros() ; return ;}
       c.mpd_sub(a.number, a.number, b.number, &CTX_ADDR);
-      a.isOverfow() catch | err | {
+      a.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -388,7 +388,7 @@ pub const dcml = struct{
     pub fn subTo(r: DCMLFX ,a: DCMLFX ,b: DCMLFX) !void {
       if( a.isZeros()) {r.setZeros() ; return ;}
       c.mpd_sub(r.number, a.number, b.number, &CTX_ADDR);
-      r.isOverfow() catch | err | {
+      r.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -400,7 +400,7 @@ pub const dcml = struct{
     pub fn mul(a: DCMLFX ,b: DCMLFX) !void {
       if( a.isZeros()) {a.setZeros() ; return ;}
       c.mpd_mul(a.number, a.number, b.number, &CTX_ADDR);
-      a.isOverfow() catch | err | {
+      a.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -412,7 +412,7 @@ pub const dcml = struct{
     pub fn mulTo(r: DCMLFX ,a: DCMLFX ,b: DCMLFX) !void {
       if( a.isZeros()) {r.setZeros() ; return ;}
       c.mpd_mul(r.number, a.number, b.number, &CTX_ADDR,);
-      r.isOverfow() catch | err | {
+      r.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -425,7 +425,7 @@ pub const dcml = struct{
       if( b.isZeros()) return dcmlError.div_impossible_zeros;
       if( a.isZeros()) {a.setZeros() ; return ;}
       c.mpd_div(a.number, a.number, b.number, &CTX_ADDR);
-      a.isOverfow() catch | err | {
+      a.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -438,7 +438,7 @@ pub const dcml = struct{
       if( b.isZeros()) return dcmlError.div_impossible_zeros;
       if( a.isZeros()) {r.setZeros() ; return ;}
       c.mpd_mul(r.number, a.number, b.number, &CTX_ADDR,);
-      r.isOverfow() catch | err | {
+      r.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -450,7 +450,7 @@ pub const dcml = struct{
     pub fn floor(r: DCMLFX ,a: DCMLFX) !void {
       if( a.isZeros()) {r.setZeros() ; return ;}
       c.mpd_floor(r.number, a.number,  &CTX_ADDR);
-      r.isOverfow() catch | err | {
+      r.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -462,7 +462,7 @@ pub const dcml = struct{
     pub fn ceil(r: DCMLFX ,a: DCMLFX) !void {
       if( a.isZeros()) {r.setZeros() ; return ;}
       c.mpd_ceil(r.number, a.number,  &CTX_ADDR);
-      r.isOverfow() catch | err | {
+      r.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -474,7 +474,7 @@ pub const dcml = struct{
       if( b.isZeros()) return dcmlError.div_impossible_zeros;
       if( a.isZeros()) {r.setZeros() ; return ;}
       c.mpd_rem(r.number, a.number, b.number, &CTX_ADDR);
-      r.isOverfow() catch | err | {
+      r.isOverflow() catch | err | {
         if (err == dcmlError.isOverflow_entier) return err ;
       } ;
     }
@@ -540,11 +540,11 @@ pub const dcml = struct{
 
     c.mpd_add(resttc.number,resttc.number, reshtx.number, &CTX_ADDR);
 
-    reshtx.isOverfow() catch | err | {
+    reshtx.isOverflow() catch | err | {
       if (err == dcmlError.isOverflow_entier_htx) return err ;
     } ;
 
-    resttc.isOverfow() catch | err | {
+    resttc.isOverflow() catch | err | {
       if (err == dcmlError.isOverflow_entier_ttc) return err ;
     } ;
   }
@@ -580,85 +580,86 @@ pub const dcml = struct{
   pub fn debugContext() void {
     std.debug.print("{any}\n", .{CTX_ADDR});
   }
-};
 
-// end decimal
-//---------------------------------------------------------------------------------
-
+  // end decimal
+  //---------------------------------------------------------------------------------
 
 
-//================================
-// function utilitaire
-//================================
-/// Iterator support iteration string
-pub const iteratStr = struct {
-  var strbuf:[] const u8 = undefined;
-  var arenastr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-  
-  //defer arena.deinit();
-  const allocator = arenastr.allocator();
-  
-  /// Errors that may occur when using String
-  pub const ErrNbrch = error{
-      InvalideAllocBuffer,
-  };
-  fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-    var buf = allocator.alloc(u8, size) catch {
-            return ErrNbrch.InvalideAllocBuffer;
-        };
-    return buf;
-  }
 
-  pub const StringIterator = struct {
-      buf: []u8 ,
-      index: usize ,
-
-    pub fn next(it: *StringIterator) ?[]const u8 {
-      var optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
-      it.buf= optional_buf orelse "";
-      var n : usize = 0;
-      while (true) {
-          if (n >= strbuf.len) break;
-          it.buf[n] = strbuf[n];
-          n += 1;
-      }
-
-      if (it.index == it.buf.len) return null;
-      var i = it.index;
-      it.index += getUTF8Size(it.buf[i]);
-      return it.buf[i..it.index];
+  //================================
+  // function utilitaire
+  //================================
+  /// Iterator support iteration string
+  pub const iteratStr = struct {
+    var strbuf:[] const u8 = undefined;
+    var arenastr = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    
+    //defer arena.deinit();
+    const allocator = arenastr.allocator();
+    
+    /// Errors that may occur when using String
+    pub const ErrNbrch = error{
+        InvalideAllocBuffer,
+    };
+    fn allocBuffer ( size :usize) ErrNbrch![]u8 {
+      var buf = allocator.alloc(u8, size) catch {
+              return ErrNbrch.InvalideAllocBuffer;
+          };
+      return buf;
     }
 
-    pub fn preview(it: *StringIterator) ?[]const u8 {
-      var optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
-      it.buf= optional_buf orelse "";
-      var n : usize = 0;
-      while (true) {
-          if (n >= strbuf.len) break;
-          it.buf[n] = strbuf[n];
-          n += 1;
+    pub const StringIterator = struct {
+        buf: []u8 ,
+        index: usize ,
+
+      pub fn next(it: *StringIterator) ?[]const u8 {
+        var optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
+        it.buf= optional_buf orelse "";
+        var n : usize = 0;
+        while (true) {
+            if (n >= strbuf.len) break;
+            it.buf[n] = strbuf[n];
+            n += 1;
+        }
+
+        if (it.index == it.buf.len) return null;
+        var i = it.index;
+        it.index += getUTF8Size(it.buf[i]);
+        return it.buf[i..it.index];
       }
 
-      if (it.index == 0) return null;
-      var i = it.buf.len;
-      it.index -= getUTF8Size(it.buf[i]);
-      return it.buf[i..it.index];
+      pub fn preview(it: *StringIterator) ?[]const u8 {
+        var optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
+        it.buf= optional_buf orelse "";
+        var n : usize = 0;
+        while (true) {
+            if (n >= strbuf.len) break;
+            it.buf[n] = strbuf[n];
+            n += 1;
+        }
+
+        if (it.index == 0) return null;
+        var i = it.buf.len;
+        it.index -= getUTF8Size(it.buf[i]);
+        return it.buf[i..it.index];
+      }
+    };
+
+    /// iterator String
+    pub fn iterator(str:[] const u8) StringIterator {
+      strbuf = str;
+      return StringIterator{
+        .buf = undefined,
+        .index = 0,
+      };
+    }
+
+    /// Returns the UTF-8 character's size
+    fn getUTF8Size(char: u8) u3 {
+      return std.unicode.utf8ByteSequenceLength(char) catch {
+        return 1;
+      };
     }
   };
 
-  /// iterator String
-  pub fn iterator(str:[] const u8) StringIterator {
-    strbuf = str;
-    return StringIterator{
-      .buf = undefined,
-      .index = 0,
-    };
-  }
-
-  /// Returns the UTF-8 character's size
-  fn getUTF8Size(char: u8) u3 {
-    return std.unicode.utf8ByteSequenceLength(char) catch {
-      return 1;
-    };
-  }
 };

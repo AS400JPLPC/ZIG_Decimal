@@ -34,6 +34,7 @@ official site thank you for making this standardization available<br>
 &rarr; 2023-03-02 add rem      r = a / b<br>
 &rarr; 2023-03-02 result alignment with AS400<br>
 &rarr; 2023-03-02 update ebugPrint(cnbr: DCMLFX, txt : []const u8) <br>
+&rarr; 2023-03-27 isOverfow -> isOverflow <br>
 <br>
 &nbsp;&nbsp;&nbsp; CTX_ADDR Communication structure for default common control decimal128 -> MPD_ROUND_HALF_EVEN<br>
 <br>
