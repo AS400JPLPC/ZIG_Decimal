@@ -32,9 +32,10 @@ official site thank you for making this standardization available<br>
 &rarr; 2023-02-27 add compare  a, b  =   enum CMP. LT EQ LT<br>
 &rarr; 2023-03-02 add ceil     r = a<br>
 &rarr; 2023-03-02 add rem      r = a / b<br>
-&rarr; 2023-03-02 result alignment with AS400<br>
-&rarr; 2023-03-02 update ebugPrint(cnbr: DCMLFX, txt : []const u8) <br>
+&rarr; 2023-03-02 result alignment with OS400<br>
+&rarr; 2023-03-02 update debugPrint(cnbr: DCMLFX, txt : []const u8) <br>
 &rarr; 2023-03-27 isOverfow -> isOverflow <br>
+&rarr; 2023-03-27 test decimal 256 - 70 digit and  512 - 142 digit  work bank international <br>
 <br>
 &nbsp;&nbsp;&nbsp; CTX_ADDR Communication structure for default common control decimal128 -> MPD_ROUND_HALF_EVEN<br>
 <br>

@@ -92,13 +92,17 @@ pub const dcml = struct{
     //--------------------------------------------------------------
     // Definition ex: for management -> accounting, stock, order...
     //--------------------------------------------------------------
-    // MPD_DECIMAL32 = 32     MPD_ROUND_HALF_EVEN
+    // MPD_DECIMAL32 = 32     MPD_ROUND_HALF_EVEN  
     // MPD_DECIMAL64 = 64     MPD_ROUND_HALF_EVEN   
-    // MPD_DECIMAL128 = 128   MPD_ROUND_HALF_EVEN       
+    // MPD_DECIMAL128 = 128   MPD_ROUND_HALF_EVEN    34   digit IEE754
+    // MPD_DECIMAL256 = 256   MPD_ROUND_HALF_EVEN    70
+    // MPD_DECIMAL512 = 512   MPD_ROUND_HALF_EVEN   142  
     fn openContext() void {
         c.mpd_maxcontext(@ptrCast([*c]c.mpd_context_t, &CTX_ADDR) ) ;
-        _= c.mpd_ieee_context(@ptrCast([*c]c.mpd_context_t, &CTX_ADDR) ,128);
+        _= c.mpd_ieee_context(@ptrCast([*c]c.mpd_context_t, &CTX_ADDR), 512);
+        _= c.mpd_qsetround(&CTX_ADDR, 6); // default MPD_ROUND_HALF_EVEN
         startContext = true ;
+
     }
 
 
