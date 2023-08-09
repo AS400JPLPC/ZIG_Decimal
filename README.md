@@ -1,5 +1,7 @@
 # zig_Decimal<br>
 <br>
+**ZIG 0.11.0**
+
 processing decimal numbers with mpdecimal as a backdrop<br>
 <br>
 ***I wrote this lib to free myself from arithmetic problems on large decimals***<br>

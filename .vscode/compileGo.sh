@@ -22,13 +22,15 @@ exit 0
 fi
 
 
-objet_lib=$objet".so"
+objet_lib=$objet".a"
 
 folder_lib=$folder_src"/lib"
 
 folder_docs=$folder_src"/docs"
 
 result=$folder_lib"/"$objet_lib
+
+projet_bin=$folder"/"$objet_lib
 
 title="creat:"$objet_lib
 
@@ -38,7 +40,6 @@ title="creat:"$objet_lib
 #echo -en $folder_lib\\n
 #echo -en $objet_lib\\n
 #echo -en $folder_docs\\n
-
 echo -en $title\\n
 
 #-------------------------------------------------------------------
@@ -68,7 +69,7 @@ fi
 if [ "$mode" == "LIB" ] ; then
 	( set -x ; \
 
-        go build -ldflags="-s -w" -buildmode=c-shared -o $result  $folder_src"/"$src ;\
+        go build -ldflags="-s -w" -buildmode=c-archive -o $result  $folder_src"/"$src ;\
 	)
 fi
 
@@ -83,8 +84,6 @@ fi
 		echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$fcGreen $objet_lib "\033[0;0m"
 		echo -en "  size : "
 		ls -lrtsh $result| cut -d " " -f6
-
-		#mv $folder_bin $lib_projet
 
 	fi
 exit

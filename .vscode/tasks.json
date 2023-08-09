@@ -114,37 +114,6 @@
       }
     },
     {
-      "label": "Glade",
-      "type": "shell",
-      "command": "/usr/bin/glade  ${fileBasename}",
-      "presentation": {
-        "echo": false,
-        "reveal": "never",
-        "focus": true,
-        "clear": true
-      }
-    },
-    {
-      "label": "Conv_Glade",
-      "type": "shell",
-      "command": "./.vscode/ConvGlade.sh  ${fileDirname}  ${fileBasename}",
-      "presentation": {
-        "echo": true,
-        "focus": true,
-        "clear": true
-      }
-    },
-    {
-      "label": "Conv_Css",
-      "type": "shell",
-      "command": "./.vscode/ConvCss.sh  ${fileDirname}  ${fileBasename}",
-      "presentation": {
-        "echo": true,
-        "focus": true,
-        "clear": true
-      }
-    },
-    {
       "label": "GREP-ZIG-1",
       "type": "shell",
       "command": "/usr/bin/xfce4-terminal --title=GREP --hold --geometry 160x20 --zoom=2 -e ./.vscode/grep_zig.sh",
@@ -178,7 +147,7 @@
         "clear": true
       }
     },
-   {
+    {
     "label": "A-GTKVTE",
     "type": "shell",
     "command": "${workspaceFolder}/Term ./${fileBasenameNoExtension}",
@@ -188,18 +157,30 @@
       "reveal": "never",
       "focus": true
     }
-   },
-   {
+    },
+    {
     "label": "Z-Terminal",
     "type": "shell",
-    "command": "xfce4-terminal",
+    "command": "/home/soleil/.Terminal/console.sh ${workspaceFolder} ",
     "problemMatcher": [],
     "presentation": {
       "echo": true,
       "reveal": "never",
       "focus": true
     }
-   }
+    },
+    {
+    // auto close terminal
+    "label": "Z-dbg",
+    "type": "shell",
+    "command": "${workspaceFolder}/Gen ./${fileBasenameNoExtension} ",
+    "problemMatcher": [],
+    "presentation": {
+      "reveal": "silent",
+      "revealProblems": "onProblem",
+      "close": true
+    }
+    },
 
   ]
 }
