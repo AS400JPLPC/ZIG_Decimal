@@ -98,8 +98,8 @@ pub const dcml = struct{
     // MPD_DECIMAL256 = 256   MPD_ROUND_HALF_EVEN    70
     // MPD_DECIMAL512 = 512   MPD_ROUND_HALF_EVEN   142  
     fn openContext() void {
-        c.mpd_maxcontext(@ptrCast([*c]c.mpd_context_t, &CTX_ADDR) ) ;
-        _= c.mpd_ieee_context(@ptrCast([*c]c.mpd_context_t, &CTX_ADDR), 512);
+        c.mpd_maxcontext(&CTX_ADDR)  ;
+        _= c.mpd_ieee_context(&CTX_ADDR, 512);
         _= c.mpd_qsetround(&CTX_ADDR, 6); // default MPD_ROUND_HALF_EVEN
         startContext = true ;
 
@@ -117,7 +117,7 @@ pub const dcml = struct{
         .entier = iEntier ,
         .scale  = iScale
       };
-      c.mpd_set_string(snum.number, "0", @ptrCast([*c]c.mpd_context_t, &CTX_ADDR) );
+      c.mpd_set_string(@ptrCast(snum.number), @ptrCast("0"), &CTX_ADDR );
       c.mpd_set_flags(snum.number,128);
       return snum;
     }
@@ -226,7 +226,7 @@ pub const dcml = struct{
       isValid(cnbr, str) catch | err | {return err ;} ;
       const sVal = allocator.alloc(u8, str.len ) catch unreachable;
       std.mem.copy(u8, sVal, str);
-      c.mpd_set_string(cnbr.number, @ptrCast(*u8,sVal), @ptrCast([*c]c.mpd_context_t, &CTX_ADDR) );
+      c.mpd_set_string(@ptrCast(cnbr.number), @ptrCast(sVal),  &CTX_ADDR );
     }
 
 
@@ -234,7 +234,7 @@ pub const dcml = struct{
 
     // set "0" 
     pub fn setZeros(cnbr: DCMLFX) void {
-      c.mpd_set_string(cnbr.number, @ptrCast([*c] const u8,"0"), @ptrCast([*c]c.mpd_context_t, &CTX_ADDR) );
+      c.mpd_set_string(@ptrCast(cnbr.number), @ptrCast("0"),  &CTX_ADDR);
     }
 
 
@@ -255,19 +255,19 @@ pub const dcml = struct{
       var r: [*c]c.mpd_t = c.mpd_qnew();
       var i : usize = 1;
       var m: c_int = 10;
-      c.mpd_copy(r , cnbr.number , @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+      c.mpd_copy(r , cnbr.number , &CTX_ADDR);
       if (cnbr.scale > 0){
         while( i <= cnbr.scale) : (i += 1) {
-          c.mpd_mul_i32(r , r, m ,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+          c.mpd_mul_i32(r , r, m , &CTX_ADDR);
         }
         i = 1;
-        c.mpd_round_to_int(r , r,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+        c.mpd_round_to_int(r , r,  &CTX_ADDR);
         while( i <= cnbr.scale) : (i += 1) {
-          c.mpd_div_i32(r , r, m ,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+          c.mpd_div_i32(r , r, m , &CTX_ADDR);
         }
       }
-      else c.mpd_floor(r , r,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
-      c.mpd_copy(cnbr.number , r,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+      else c.mpd_floor(r , r,  &CTX_ADDR);
+      c.mpd_copy(cnbr.number , r,  &CTX_ADDR);
     }
 
 
@@ -279,19 +279,19 @@ pub const dcml = struct{
       var r: [*c]c.mpd_t = c.mpd_qnew();
       var i : usize = 1;
       var m: c_int = 10;
-      c.mpd_copy(r , cnbr.number , @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+      c.mpd_copy(r , cnbr.number , &CTX_ADDR);
       if (cnbr.scale > 0){
         while( i <= cnbr.scale) : (i += 1) {
-          c.mpd_mul_i32(r , r, m ,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+          c.mpd_mul_i32(r , r, m ,  &CTX_ADDR);
         }
         i = 1;
-        c.mpd_trunc(r , r,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+        c.mpd_trunc(r , r, &CTX_ADDR);
         while( i <= cnbr.scale) : (i += 1) {
-          c.mpd_div_i32(r , r, m ,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+          c.mpd_div_i32(r , r, m , &CTX_ADDR);
         }
       }
-      else c.mpd_floor(r , r,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
-      c.mpd_copy(cnbr.number , r,  @ptrCast([*c]c.mpd_context_t, &CTX_ADDR));
+      else c.mpd_floor(r , r, &CTX_ADDR);
+      c.mpd_copy(cnbr.number , r, &CTX_ADDR);
     }
 
 
@@ -401,7 +401,7 @@ pub const dcml = struct{
 
 
     // function mult
-    pub fn mul(a: DCMLFX ,b: DCMLFX) !void {
+    pub fn mult(a: DCMLFX ,b: DCMLFX) !void {
       if( a.isZeros()) {a.setZeros() ; return ;}
       c.mpd_mul(a.number, a.number, b.number, &CTX_ADDR);
       a.isOverflow() catch | err | {
@@ -413,7 +413,7 @@ pub const dcml = struct{
 
 
     // function mult
-    pub fn mulTo(r: DCMLFX ,a: DCMLFX ,b: DCMLFX) !void {
+    pub fn multTo(r: DCMLFX ,a: DCMLFX ,b: DCMLFX) !void {
       if( a.isZeros()) {r.setZeros() ; return ;}
       c.mpd_mul(r.number, a.number, b.number, &CTX_ADDR,);
       r.isOverflow() catch | err | {
@@ -534,7 +534,7 @@ pub const dcml = struct{
     if( val.isZeros() or val.isZeros() or coef.isZeros()) {resttc.setZeros() ; reshtx.setZeros() ;return ;}
 
     var cent: [*c]c.mpd_t = c.mpd_qnew();
-    c.mpd_set_string(cent, @ptrCast([*c] const u8,"100"), @ptrCast([*c]c.mpd_context_t, &CTX_ADDR) );
+    c.mpd_set_string(@ptrCast(cent), @ptrCast("100"),&CTX_ADDR) ;
     
     c.mpd_mul(reshtx.number,val.number, nbr.number, &CTX_ADDR);
 
@@ -562,7 +562,7 @@ pub const dcml = struct{
     const allocator = std.heap.page_allocator;
     const sVal = allocator.alloc(u8, str.len ) catch unreachable;
     std.mem.copy(u8, sVal, str);
-    c.mpd_set_string(cnbr.number, @ptrCast(*u8,sVal), @ptrCast([*c]c.mpd_context_t, &CTX_ADDR) );
+    c.mpd_set_string(@ptrCast(cnbr.number), @ptrCast(sVal),&CTX_ADDR );
   }
 
 
