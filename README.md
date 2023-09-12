@@ -19,7 +19,7 @@ Another source that inspired me and that joins what I think<br>
 **os linux** <br>
 **I don't have Windows or Macintosh but it should work **<br>
 <br>
-[https://www.bytereef.org/mpdecimal/index.html](https://www.bytereef.org/mpdecimal/index.html)<br>
+[](https://www.bytereef.org/mpdecimal/index.html)<br>
 <br>
 const c = @cImport( { @cInclude("mpdecimal.h"); } );<br>
 <br>
