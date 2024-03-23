@@ -1,7 +1,5 @@
 # zig_Decimal<br>
 <br>
-**ZIG 0.11.0**
-
 processing decimal numbers with mpdecimal as a backdrop<br>
 <br>
 ***I wrote this lib to free myself from arithmetic problems on large decimals***<br>
@@ -19,7 +17,7 @@ Another source that inspired me and that joins what I think<br>
 **os linux** <br>
 **I don't have Windows or Macintosh but it should work **<br>
 <br>
-https://www.bytereef.org/mpdecimal/index.html<br>
+&nbsp;&nbsp;[https://www.bytereef.org/mpdecimal/index.html](https://www.bytereef.org/mpdecimal/index.html)<br>
 <br>
 const c = @cImport( { @cInclude("mpdecimal.h"); } );<br>
 <br>
@@ -118,3 +116,5 @@ official site thank you for making this standardization available<br>
 &nbsp;&nbsp;&nbsp; dsperr: practical @panic product in test<br>
 <br>
 &nbsp;&nbsp;&nbsp; debugContext: print context<br>
+
+&nbsp;&nbsp;&nbsp;&larr; 2024-03-23  update  change var const ...

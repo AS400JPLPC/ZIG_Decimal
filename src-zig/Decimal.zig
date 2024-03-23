@@ -77,7 +77,7 @@ std.debug.print("\r\nzeros {}\r\n",.{vente.ttc.isZeros()});
 
 var r = dcml.DCMLFX.def(7,3) catch unreachable;       // set 0 init default
 var t = dcml.DCMLFX.def(12,2) catch unreachable;     // set 0 init default
-var x = dcml.DCMLFX.def(12,0) catch unreachable;
+const x = dcml.DCMLFX.def(12,0) catch unreachable;
 var z = dcml.DCMLFX.def(5,2) catch unreachable;
 dcml.forceAssign(t, "2.46") catch unreachable;
 dcml.forceAssign(x, "2") catch unreachable;
@@ -104,7 +104,7 @@ t.setZeros();
 
 
 dcml.forceAssign(r, "12.650") catch unreachable;
-var repcmp = dcml.cmp(r,t) catch | err | {dcml.dsperr.errorDcml(err); return;};
+const repcmp = dcml.cmp(r,t) catch | err | {dcml.dsperr.errorDcml(err); return;};
 
 if(repcmp == dcml.CMP.GT) std.debug.print("\r\nrepcom =  r > t \r\n",.{});
 
