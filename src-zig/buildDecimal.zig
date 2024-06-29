@@ -1,10 +1,12 @@
+// version 0.12. dev
+
 const std = @import("std");
 
-pub fn build(b: *std.build) void {
-    // Standard release options allow the person running `zig build` to select
-    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
-    const target   = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
+pub fn build(b: *std.Build) void {
+	// Standard release options allow the person running `zig build` to select
+	// between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
+	const target   = b.standardTargetOptions(.{});
+	const optimize = b.standardOptimizeOption(.{});
  
     // zig-src            source projet
     // zig-src/deps       curs/ form / outils ....
@@ -15,25 +17,24 @@ pub fn build(b: *std.build) void {
     // Definition of dependencies
 
     const decimal = b.createModule(.{
-      .source_file = .{ .path = "./deps/decimal/decimal.zig"},
+      .root_source_file=  b.path( "./deps/decimal/decimal.zig"),
     });
-     
-
+	decimal.addIncludePath(b.path( "./lib/"));
+	
     // Building the executable
     const Prog = b.addExecutable(.{
     .name = "Decimal",
-    .root_source_file = .{ .path = "./Decimal.zig" },
+    .root_source_file =  b.path( "./Decimal.zig" ),
     .target = target,
     .optimize = optimize,
     });
 
-    Prog.addIncludePath(.{.path = "./lib/"});
+
     Prog.linkLibC();
     Prog.addObjectFile(.{.cwd_relative = "/usr/lib/libmpdec.so"});
-    Prog.addModule("decimal"   , decimal);
+    Prog.root_module.addImport("decimal"   , decimal);
 
-    const install_exe = b.addInstallArtifact(Prog, .{});
-    b.getInstallStep().dependOn(&install_exe.step); 
+    b.installArtifact(Prog);
 
 
 
@@ -43,13 +44,13 @@ pub fn build(b: *std.build) void {
     // Building the executable
     const docs = b.addTest(.{
     .name = "Decimal",
-    .root_source_file = .{ .path = "./Decimal.zig" },
+    .root_source_file =  b.path( "./Decimal.zig" ),
     });
 
-
+    docs.addIncludePath(.{.cwd_relative = "usr/include/"});
     docs.linkLibC();
     docs.addObjectFile(.{.cwd_relative = "/usr/lib/libmpdec.so"});
-    docs.addModule("decimal"   , decimal);
+    docs.root_module.addImport("decimal"   , decimal);
 
 
     const install_docs = b.addInstallDirectory(.{
