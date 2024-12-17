@@ -1,6 +1,4 @@
 # zig_Decimal<br>
-
-# update zig  0.13.0 <br>
 <br>
 processing decimal numbers with mpdecimal as a backdrop<br>
 <br>
@@ -65,7 +63,7 @@ official site thank you for making this standardization available<br>
 <br>
 &nbsp;&nbsp;&nbsp;   isOverflow: check if the internal value is out of bounds<br>
 <br>
-&nbsp;&nbsp;&nbsp;   assign: give a value (text format) to ".number"<br>
+&nbsp;&nbsp;&nbsp;   setDcml: give a value (text format) to ".number"<br>
 <br>
 &nbsp;&nbsp;&nbsp;   setZeros: forces the value 0 to ".number"<br>
 <br>
@@ -111,12 +109,8 @@ official site thank you for making this standardization available<br>
 <br>
 &nbsp;&nbsp;&nbsp; cmp compare  a ,b return CMP<br>
 <br>
-&nbsp;&nbsp;&nbsp; mdrate module: returns ex: ttc , htx (base val, article nrb, rate = 25 ) practice in 5 operations<br>
-<br>
-&nbsp;&nbsp;&nbsp; forceAssign: forces the value<br>
-<br>
 &nbsp;&nbsp;&nbsp; dsperr: practical @panic product in test<br>
 <br>
 &nbsp;&nbsp;&nbsp; debugContext: print context<br>
 
-&nbsp;&nbsp;&nbsp;&larr; 2024-03-23  update  change var const ...
+&nbsp;&nbsp;&nbsp;&larr; 2024-12-17  **I have completed the checks and memory leak tests, the functions are reviewed and corrected with the consideration.**
