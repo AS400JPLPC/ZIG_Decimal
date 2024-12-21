@@ -57,6 +57,7 @@ envCPP="1"
 envZIG="2"
 PROJECT="DECIMAL"
 LIBPROJECT="/home/soleil/Zdecimal/"
+LIBRARY="/home/soleil/Zdecimal/library/"
 choix=""
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -69,7 +70,7 @@ do
 	f_dsplyPos  6  24 $faGras$fcJaune '------------compile Zig-----------------'
 	f_dsplyPos  8  20 $faGras$fcRouge'10.'; f_dsplyPos  8  24 $faGras$fcGreen 'Testmem'
 	f_dsplyPos 10  20 $faGras$fcRouge'11.'; f_dsplyPos 10  24 $faGras$fcGreen 'Testuse'
-
+    f_dsplyPos 12  20 $faGras$fcRouge'12.'; f_dsplyPos 12  24 $faGras$fcGreen 'Test'
 
 	f_dsplyPos 13  24 $faGras$fcJaune '----------------------------------------'
 
@@ -77,7 +78,7 @@ do
 
 	f_dsplyPos 16  20 $faGras$fcRouge'44.'; f_dsplyPos 16  24 $faGras$fcCyan  'enScript Printer'
 
-
+	f_dsplyPos 18  20 $faGras$fcRouge'50.'; f_dsplyPos 18  24 $faGras$fcCyan  'Edit my library'	
 
 	f_dsplyPos 20  20 $faGras$fcRouge'55.'; f_dsplyPos 20  24 $faGras$fcCyan  'Edit my project'
 
@@ -113,6 +114,11 @@ do
 		;;
 
 
+		12)
+			/home/soleil/.Terminal/dispatch.sh $envZIG $LIBPROJECT   "Test"
+		;;
+
+
 #debug
 		33)
 			/home/soleil/.Terminal/debugZig.sh $PROJECT
@@ -123,6 +129,12 @@ do
 			/home/soleil/.Terminal/enScript.sh  $LIBPROJECT
 		;;
 
+#library
+		50)
+			/home/soleil/.Terminal/myProject.sh  $PROJECT $LIBRARY
+			#sleep 2
+			#break
+		;;
 
 #project
 		55)

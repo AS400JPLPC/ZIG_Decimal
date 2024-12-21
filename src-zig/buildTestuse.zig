@@ -13,12 +13,9 @@ pub fn build(b: *std.Build) void {
 
 
     // Definition of dependencies
+    const zenlib_dep = b.dependency("library", .{});
 
-    const decimal = b.createModule(.{
-      .root_source_file=  b.path( "./deps/decimal/decimal.zig"),
-    });
-	decimal.addIncludePath(b.path( "./lib/"));
-	
+    
     // Building the executable
     const Prog = b.addExecutable(.{
     .name = "Testuse",
@@ -30,8 +27,7 @@ pub fn build(b: *std.Build) void {
 
     Prog.linkLibC();
     Prog.addObjectFile(.{.cwd_relative = "/usr/lib/libmpdec.so"});
-    Prog.root_module.addImport("decimal"   , decimal);
-
+    Prog.root_module.addImport("decimal", zenlib_dep.module("decimal"));
     b.installArtifact(Prog);
 
 
@@ -47,8 +43,7 @@ pub fn build(b: *std.Build) void {
     docs.addIncludePath(.{.cwd_relative = "usr/include/"});
     docs.linkLibC();
     docs.addObjectFile(.{.cwd_relative = "/usr/lib/libmpdec.so"});
-    docs.root_module.addImport("decimal"   , decimal);
-
+    docs.root_module.addImport("decimal", zenlib_dep.module("decimal"));
 
     const install_docs = b.addInstallDirectory(.{
         .source_dir = docs.getEmittedDocs(),

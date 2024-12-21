@@ -8,18 +8,17 @@ processing decimal numbers with mpdecimal as a backdrop<br>
 <br>
 This part explains why we need it.<br>
 <br>
-Another source that inspired me and that joins what I think<br>
+Another source that inspired me and that joins what I think 1990 <br>
 <br>
 [https://github.com/dnotq/decNumber](https://github.com/dnotq/decNumber)<br>
 <br>
 ---
 <br>
-**os linux** <br>
-**I don't have Windows or Macintosh but it should work **<br>
 <br>
 &nbsp;&nbsp;[https://www.bytereef.org/mpdecimal/index.html](https://www.bytereef.org/mpdecimal/index.html)<br>
 <br>
-const c = @cImport( { @cInclude("mpdecimal.h"); } );<br>
+Include("mpdecimal.h) view build;<br>
+<br> you need to mount the mpdecimal package in your system<br>
 <br>
 installation with your package manager or download<br>
 <br>
@@ -29,12 +28,7 @@ official site thank you for making this standardization available<br>
 <br>
 ---
 <br>
-&rarr; 2023-02-27 add compare  a, b  =   enum CMP. LT EQ LT<br>
-&rarr; 2023-03-02 add ceil     r = a<br>
-&rarr; 2023-03-02 add rem      r = a / b<br>
-&rarr; 2023-03-02 result alignment with OS400<br>
-&rarr; 2023-03-02 update debugPrint(cnbr: DCMLFX, txt : []const u8) <br>
-&rarr; 2023-03-27 isOverfow -> isOverflow <br>
+
 &rarr; 2023-03-27 test decimal 256 - 70 digit and  512 - 142 digit  work bank international <br>
 <br>
 &nbsp;&nbsp;&nbsp; CTX_ADDR Communication structure for default common control decimal128 -> MPD_ROUND_HALF_EVEN<br>
@@ -48,69 +42,70 @@ official site thank you for making this standardization available<br>
 &nbsp;&nbsp;&nbsp;       integer: number of integers in front of the point<br>
 &nbsp;&nbsp;&nbsp;       scale: number of integers behind the point<br>
 <br>
-&nbsp;&nbsp;&nbsp;   associated function:<br>
-<br>
-&nbsp;&nbsp;&nbsp;   def: checks the relevance of bounding with mpdecimal and determines the fixed decimal<br>
-&nbsp;&nbsp;&nbsp;         Test if the context is active otherwise it calls openContext()<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;   free: frees the associated memory storage ".number" (not the definition)<br>
-<br>
-&nbsp;&nbsp;&nbsp;   debugPrint: small followed by ".number"<br>
-<br>
-&nbsp;&nbsp;&nbsp;   isNumber: check value is compliant '0-9 + - .' compliant SQL postgres DB2...<br>
-<br>
-&nbsp;&nbsp;&nbsp;   isValide: uses isNumber, and checks if the external value  complies with the boundary<br>
-<br>
-&nbsp;&nbsp;&nbsp;   isOverflow: check if the internal value is out of bounds<br>
-<br>
-&nbsp;&nbsp;&nbsp;   setDcml: give a value (text format) to ".number"<br>
-<br>
-&nbsp;&nbsp;&nbsp;   setZeros: forces the value 0 to ".number"<br>
-<br>
-&nbsp;&nbsp;&nbsp;   isZeros: checks if the value 0<br>
-<br>
-&nbsp;&nbsp;&nbsp;   round: two-function round and truncate (0.5 = +1) see finance...<br>
-<br>
-&nbsp;&nbsp;&nbsp;   trunc: to a function, truncate without rounding<br>
+
+
 <br>
 &nbsp;&nbsp;&nbsp;   string: if the scale part is larger than its definition,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it rounds then adds zeros if necessary<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(respects the SQL display alignment standard on the left ex: 1.00)<br>
 <br>
-&nbsp;&nbsp;&nbsp;   add: a = a + b<br>
-<br>
-&nbsp;&nbsp;&nbsp;   sub: a = a - b<br>
-<br>
-&nbsp;&nbsp;&nbsp;   mul: a = a x b<br>
-<br>
-&nbsp;&nbsp;&nbsp;   div: a = a / b      if b = zeros raises an error<br>
-<br>
-&nbsp;&nbsp;&nbsp;   addTo: r = a + b<br>
-<br>
-&nbsp;&nbsp;&nbsp;   subTo: r = a - b<br>
-<br>
-&nbsp;&nbsp;&nbsp;   mulTo: r = a x b<br>
-<br>
-&nbsp;&nbsp;&nbsp;   divto: r = a / b      if b = zeros raises an error<br>
-<br>
-&nbsp;&nbsp;&nbsp;   floor: r = a<br>
-<br>
-&nbsp;&nbsp;&nbsp;   ceil : r = a<br>
-<br>
-&nbsp;&nbsp;&nbsp;   rem  : r = a / b      if b = zeros raises an error<br>
-<br>
 &nbsp;&nbsp;&nbsp;   rate: raises a value with the percentage ex ( n = (val x nbr) , val = (n x %1.25)<br>
 <br>
-&nbsp;&nbsp;&nbsp;<br>
-<br>
-&nbsp;&nbsp;&nbsp; function off DCMLF<br>
-<br>
-&nbsp;&nbsp;&nbsp; enum CMP LT EQ GT<br>
-<br>
-&nbsp;&nbsp;&nbsp; cmp compare  a ,b return CMP<br>
-<br>
-&nbsp;&nbsp;&nbsp; dsperr: practical @panic product in test<br>
-<br>
-&nbsp;&nbsp;&nbsp; debugContext: print context<br>
 
-&nbsp;&nbsp;&nbsp;&larr; 2024-12-17  **I have completed the checks and memory leak tests, the functions are reviewed and corrected with the consideration.**
+
+
+|Function      | Description                                          | Pub |
+|--------------|------------------------------------------------------|-----|
+|openContex    | Creates icontext internal lib mpdecimal              |     |
+|init          | Creates Decimal  (E,tier ,  Scal)                    |  x  |
+|deinit        | De-allocates the Decimal                             |  x  |
+|              |                                                      |     |
+|isActif       | check the area is still active                       |  x  |
+|isNumber      | check value is compliant '0-9 + - .'                 |     |
+|isValide      | control number and validity normalize                |  x  |
+|isOverflow    | check if the internal value is out of bounds         |  x  |
+[setDcml       | give a value (text format) to ".number"              |  x  |
+|setZero       | forces the value 0 to ".number"                      |  x  |
+|isZeros       | checks if the value 0                                |  x  [
+|round         | two-function round and truncate see finance...       |  x  |
+|trunc         | to a function, truncate without rounding             |  x  |
+|string        | format area if the scale part is larger,it rounds    |  x  |
+|              |                                                      |     |
+|add           | a = a + b  a.add(b)                                  |  x  |
+|sub           | a = a - b                                            |  x  |
+|mult          | a = a * b                                            |  x  |
+|div           | a = a / b  if b = zeros raises an error              |  x  |
+|addTo         | r = a + b  r.addto(a,b)                              |  x  |
+|subTo         | r = a - b                                            |  x  |
+|multTo        | r = a * b                                            |  x  |
+|divTo         | r = a / b  if b = zeros raises an error              |  x  |
+|floor         | r = a                                                |  x  |
+|ceil          | r = a                                                |  x  |
+|rem           | r = a / b  if b = zeros raises an error              |  x  |
+|rate          | total.rate(prix,nbritem,tax)                         |  x  |
+|cmp           | compare a , b returns EQ LT GT                       |  x  |
+|              |                                                      |     |
+|dsperr        | practical @panic product in test                     |  x  |
+[debugContext  | displlay  context value internal mpdecimal           |  x  [
+|debugPrint    | small followed by ".number"                          |  x  |
+|              |                                                      |  x  |
+|Dcmliterator  | Struct Iterator                                      |  x  |
+|next          | next iterator Char(UTF8)                             |  x  |
+|preview       | preview iterator Char(UTF8)                          |  x  |
+|iterator      | Returns a StringIterator over the String             |  x  |
+|isUTF8Byte    | Checks if byte is part of UTF-8 character            |  .  |
+|getIndex      | Returns the real index of a unicode                  |  .  |
+|getUTF8Size   | Returns the UTF-8 character's size                   |  .  |
+ 
+
+
+
+
+
+ sp;&nbsp;&larr; 2024-12-17  **I have completed the checks and memory leak tests, the functions are reviewed and corrected with the consideration.**
+
+
+&rarr; 2024-12-19  harmonization of functions between ZSTRING AND DECIMAL, in order to have a simplification in programming<br>
+Another check and a typo corrected in the string function<br>
+<br>
+&rarr; 2024-12-19 The build in the library as well as in src-zig is compliant and without redundancy.
