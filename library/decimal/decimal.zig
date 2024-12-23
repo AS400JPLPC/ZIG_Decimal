@@ -76,21 +76,11 @@ const dcmlError = error {
 	Failed_valid_entier,
 	Failed_valid_scale,
 	Failed_valid_dot,
-	isOverflow_entier,
-	isOverflow_scale,
-	isOverflow_entier_htx,
-	isOverflow_entier_ttc,
+	isOverflow_number,
 	div_impossible_zeros,
 	cmp_impossible
 };
 
-
-
-pub const CMP = enum (u8) {
-		  LT ,
-		  EQ ,
-		  GT ,
-};
 
 var arenaDcml = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 var allocDcml = arenaDcml.allocator();
@@ -99,6 +89,12 @@ pub fn deinitDcml() void {
     arenaDcml = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     allocDcml = arenaDcml.allocator();
 }
+pub const CMP = enum (u8) {
+		  LT ,
+		  EQ ,
+		  GT ,
+};
+
 
 pub const DCMLFX = struct {
 		number  : [*c]c.mpd_t ,	 // number 
@@ -168,6 +164,7 @@ pub const DCMLFX = struct {
 	// Numerical value control
 	fn isNumber (str :[] const u8) bool {
 		if (std.mem.eql(u8, str, "") ) return false;
+
 		var iter = iteratDcml.iterator(str);
 		defer iter.deinit();
 		var b: bool = true;
@@ -195,6 +192,7 @@ pub const DCMLFX = struct {
 	// Validity check
 	pub fn isValid (cnbr: DCMLFX, str :[] const u8) ! void {
 		if (!isNumber(str)) return dcmlError.Failed_isNumber_string;
+		
 		var iter = iteratDcml.iterator(str);
 		defer iter.deinit();
 		var e: usize = 0 ;	// nbr carctère entier
@@ -208,8 +206,7 @@ pub const DCMLFX = struct {
 				else => {},
 			}
 		}
-		if (cnbr.entier < e) return dcmlError.Failed_valid_entier;
-		if (cnbr.scale  < s) return dcmlError.Failed_valid_scale;
+		if (cnbr.entier + cnbr.scale < e + s) return dcmlError.isOverflow_number;
 		if (p and s == 0)	return dcmlError.Failed_valid_dot;
 		return ;
 	}
@@ -219,12 +216,13 @@ pub const DCMLFX = struct {
 
 	// Validity check Overflow
 	pub fn isOverflow (cnbr: DCMLFX) ! void {
-		work = std.fmt.allocPrint(allocDcml,"{s}", .{std.mem.span(c.mpd_to_eng(cnbr.number, 0))}) catch unreachable;
+		work = std.mem.span(c.mpd_to_eng(cnbr.number, 0));
+		defer allocDcml.free(work);
 		var iter = iteratDcml.iterator(work);
 		defer iter.deinit();
 		var e: usize = 0 ;	// nbr carctère entier
 		var s: usize = 0 ;	// nbr carctère scale
-		var p: bool =false;   // '.' 
+		var p: bool =false;   // '.'
 		while (iter.next()) |ch|  {
 			const x = utf.utf8Decode(ch) catch unreachable;
 			switch (x) {
@@ -233,15 +231,14 @@ pub const DCMLFX = struct {
 				else => {},
 			}
 		}
-		if (cnbr.entier < e) return dcmlError.isOverflow_entier;
-		if (cnbr.scale  < s) return dcmlError.isOverflow_scale;
+		if (cnbr.entier + cnbr.scale < e + s) return dcmlError.isOverflow_number;
 	}
 
 
 
 	// You are responsible for the value.
-	pub fn setDcml(cnbr: DCMLFX, str: []const u8)  ! void {
-		if (!isNumber(str)) return dcmlError.Failed_isNumber_string;
+	pub fn setDcml(cnbr: DCMLFX, str: [] const u8)  ! void {
+		 if (!isNumber(str)) return dcmlError.Failed_isNumber_string;
 		if ( str.len == 0 ) {
 			c.mpd_set_string(@ptrCast(cnbr.number), @ptrCast("0"),  &CTX_ADDR );
 			return;
@@ -325,7 +322,8 @@ pub const DCMLFX = struct {
 
 
 		work = std.fmt.allocPrint(allocDcml,"{s}",.{std.mem.span(c.mpd_to_eng(cnbr.number, 0))}) catch unreachable;
-
+		defer allocDcml.free(work);
+		
 		var iterA = iteratDcml.iterator(work);
 		defer iterA.deinit();
 		var s: usize = 0 ;	// nbr carctère scale
@@ -342,7 +340,7 @@ pub const DCMLFX = struct {
 		if ( s > cnbr.scale ) { 
 			cnbr.round(); 
 			work = std.fmt.allocPrint(allocDcml,"{s}", .{std.mem.span(c.mpd_to_eng(cnbr.number, 0))})
-				 catch unreachable;
+					catch unreachable;
 
 			var iterB = iteratDcml.iterator(work);
 			defer iterB.deinit();
@@ -358,19 +356,20 @@ pub const DCMLFX = struct {
 			}
 		}
 
+		result = allocDcml.dupe(u8, work) catch unreachable;
+		defer allocDcml.free(result);
+
 		if ( cnbr.scale > 0 ) {
 			var n : usize = cnbr.scale - s;
-			result = std.fmt.allocPrint(allocDcml,"{s}", .{work}) catch unreachable;
+			//result = std.fmt.allocPrint(allocDcml,"{s}", .{work}) catch unreachable;
 			while (true) {
 				if (n == 0) break;
 				 if (!p) { result =  std.fmt.allocPrint(allocDcml,"{s}.", .{result}) catch unreachable; p =true;}
 				 result  = std.fmt.allocPrint(allocDcml,"{s}0", .{result}) catch unreachable;
 				 n -= 1;
 			}
-		
-			return  result;
 		}
-		else return work ;
+		return allocDcml.dupe(u8, result) catch unreachable;
 	}
 
 
@@ -378,11 +377,8 @@ pub const DCMLFX = struct {
 
 	// function ADD
 	pub fn add(a: DCMLFX ,b: DCMLFX) !void {
-		if( a.isZeros()) {a.setZeros() ; return ;}
 		c.mpd_add(a.number, a.number, b.number, &CTX_ADDR);
-		a.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		a.isOverflow() catch | err |  return err ;
 	}
 
 
@@ -390,11 +386,8 @@ pub const DCMLFX = struct {
 
 	// function ADD
 	pub fn addTo(r: DCMLFX , a: DCMLFX ,b: DCMLFX) !void {
-		if( a.isZeros()) {r.setZeros() ; return ;}
 		c.mpd_add(r.number, a.number, b.number, &CTX_ADDR);
-		r.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		r.isOverflow() catch | err |  return err ;
 	}
 
 
@@ -402,11 +395,9 @@ pub const DCMLFX = struct {
 
 	// function SUB
 	pub fn sub(a: DCMLFX ,b: DCMLFX) !void {
-		if( a.isZeros()) {a.setZeros() ; return ;}
 		c.mpd_sub(a.number, a.number, b.number, &CTX_ADDR);
-		a.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		a.isOverflow() catch | err |  return err ;
+		
 	}
 
 
@@ -414,11 +405,8 @@ pub const DCMLFX = struct {
 
 	// function SUB
 	pub fn subTo(r: DCMLFX ,a: DCMLFX ,b: DCMLFX) !void {
-		if( a.isZeros()) {r.setZeros() ; return ;}
 		c.mpd_sub(r.number, a.number, b.number, &CTX_ADDR);
-		r.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		r.isOverflow() catch | err |  return err ;
 	}
 
 
@@ -426,11 +414,8 @@ pub const DCMLFX = struct {
 
 	// function mult
 	pub fn mult(a: DCMLFX ,b: DCMLFX) !void {
-		if( a.isZeros()) {a.setZeros() ; return ;}
 		c.mpd_mul(a.number, a.number, b.number, &CTX_ADDR);
-		a.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		a.isOverflow() catch | err |  return err ;
 	}
 
 
@@ -438,11 +423,8 @@ pub const DCMLFX = struct {
 
 	// function mult
 	pub fn multTo(r: DCMLFX ,a: DCMLFX ,b: DCMLFX) !void {
-		if( a.isZeros()) {r.setZeros() ; return ;}
 		c.mpd_mul(r.number, a.number, b.number, &CTX_ADDR,);
-		r.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		r.isOverflow() catch | err |  return err ;
 	}
 
 
@@ -451,11 +433,8 @@ pub const DCMLFX = struct {
 	// function div
 	pub fn div(a: DCMLFX ,b: DCMLFX) !void {
 		if( b.isZeros()) return dcmlError.div_impossible_zeros;
-		if( a.isZeros()) {a.setZeros() ; return ;}
 		c.mpd_div(a.number, a.number, b.number, &CTX_ADDR);
-		a.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		a.isOverflow() catch | err |  return err ;
 	}
 
 
@@ -464,11 +443,8 @@ pub const DCMLFX = struct {
 	// function mult
 	pub fn divTo(r: DCMLFX ,a: DCMLFX ,b: DCMLFX) !void {
 		if( b.isZeros()) return dcmlError.div_impossible_zeros;
-		if( a.isZeros()) {r.setZeros() ; return ;}
 		c.mpd_mul(r.number, a.number, b.number, &CTX_ADDR,);
-		r.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		r.isOverflow() catch | err |  return err ;
 	}
 
 
@@ -476,23 +452,17 @@ pub const DCMLFX = struct {
 
 	// function Floor
 	pub fn floor(r: DCMLFX ,a: DCMLFX) !void {
-		if( a.isZeros()) {r.setZeros() ; return ;}
 		c.mpd_floor(r.number, a.number,  &CTX_ADDR);
-		r.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		r.isOverflow() catch | err |  return err ;
 	}
-
 
 
 
 	// function ceiling
 	pub fn ceil(r: DCMLFX ,a: DCMLFX) !void {
-		if( a.isZeros()) {r.setZeros() ; return ;}
 		c.mpd_ceil(r.number, a.number,  &CTX_ADDR);
-		r.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		r.isOverflow() catch | err |  return err ;
+
 	}
 
 
@@ -500,11 +470,8 @@ pub const DCMLFX = struct {
 	// function remainder
 	pub fn rem(r: DCMLFX ,a: DCMLFX ,b: DCMLFX) !void {
 		if( b.isZeros()) return dcmlError.div_impossible_zeros;
-		if( a.isZeros()) {r.setZeros() ; return ;}
 		c.mpd_rem(r.number, a.number, b.number, &CTX_ADDR);
-		r.isOverflow() catch | err | {
-			if (err == dcmlError.isOverflow_entier) return err ;
-		} ;
+		r.isOverflow() catch | err |  return err ;
 	}
 
 
@@ -517,7 +484,7 @@ pub const DCMLFX = struct {
 		c.mpd_mul(res.number,val.number, nbr.number, &CTX_ADDR);
 		// total ttc
 		c.mpd_mul(res.number,res.number, coef.number, &CTX_ADDR);
-
+		res.isOverflow() catch | err |  return err ;
 	}
 
 
@@ -551,7 +518,6 @@ pub const DCMLFX = struct {
 	}
 
 const iteratDcml = struct {
-	var strbuf:[] const u8 = undefined;
 		/// Errors that may occur when using String
 		const ErrNbrch = error{
 			InvalideAllocBuffer,
@@ -563,6 +529,7 @@ const iteratDcml = struct {
 			buf: []u8  ,
 			index: usize ,
 
+		    
 			fn allocBuffer ( size :usize) ErrNbrch![]u8 {
 			 	const buf = allocDcml.alloc(u8, size) catch {
 					return ErrNbrch.InvalideAllocBuffer;
@@ -573,22 +540,13 @@ const iteratDcml = struct {
 			        /// Deallocates the internal buffer
 	        fn deinit(self: *Dcmliterator) void {
 	            if (self.buf.len > 0) allocDcml.free(self.buf);
-	            strbuf = "";
 	            self.index =0;
 	        }
 	        
 
 
 			fn next(it: *Dcmliterator) ?[]const u8 {
-				const optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
-
-				it.buf= optional_buf orelse "";
-				var n : usize = 0;
-				while (true) {
-					if (n >= strbuf.len) break;
-					it.buf[n] = strbuf[n];
-					n += 1;
-				}
+				if ( it.buf.len == 0 ) return null;
 
 				if (it.index == it.buf.len) return null;
 				const i = it.index;
@@ -597,14 +555,7 @@ const iteratDcml = struct {
 			}
 
 			fn preview(it: *Dcmliterator) ?[]const u8 {
-				const optional_buf: ?[]u8  = allocBuffer(strbuf.len) catch return null;
-				it.buf= optional_buf orelse "";
-				var n : usize = 0;
-				while (true) {
-					if (n >= strbuf.len) break;
-					it.buf[n] = strbuf[n];
-					n += 1;
-				}
+				if ( it.strbuf.len == 0 ) return null;
 
 				if (it.index == 0) return null;
 				const i = it.buf.len;
@@ -615,10 +566,8 @@ const iteratDcml = struct {
 
 		/// iterator String
 		fn iterator(str:[] const u8) Dcmliterator {
-			strbuf = str;
-
 			return Dcmliterator{
-				.buf = undefined,
+				.buf = allocDcml.dupe(u8,str) catch unreachable,
 				.index = 0,
 			};
 		}

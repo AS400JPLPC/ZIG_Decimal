@@ -100,12 +100,15 @@ official site thank you for making this standardization available<br>
 
 
 
-
+<br>
 
  sp;&nbsp;&larr; 2024-12-17  **I have completed the checks and memory leak tests, the functions are reviewed and corrected with the consideration.**
-
-
-&rarr; 2024-12-19  harmonization of functions between ZSTRING AND DECIMAL, in order to have a simplification in programming<br>
-Another check and a typo corrected in the string function<br>
+<br>
+<br>
+→ 2024-12-23 03:13<BR/>
+Big is working on memory leaks.<BR/>
+Now I think it's fixed.
+<br>
+<br>
 <br>
 &rarr; 2024-12-19 The build in the library as well as in src-zig is compliant and without redundancy.
