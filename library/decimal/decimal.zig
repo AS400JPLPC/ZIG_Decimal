@@ -518,24 +518,10 @@ pub const DCMLFX = struct {
 	}
 
 const iteratDcml = struct {
-		/// Errors that may occur when using String
-		const ErrNbrch = error{
-			InvalideAllocBuffer,
-		};
-
-
 
 		const Dcmliterator = struct {
 			buf: []u8  ,
 			index: usize ,
-
-		    
-			fn allocBuffer ( size :usize) ErrNbrch![]u8 {
-			 	const buf = allocDcml.alloc(u8, size) catch {
-					return ErrNbrch.InvalideAllocBuffer;
-				 };
-				return buf;
-			}
 
 			        /// Deallocates the internal buffer
 	        fn deinit(self: *Dcmliterator) void {
@@ -554,14 +540,6 @@ const iteratDcml = struct {
 				return it.buf[i..it.index];
 			}
 
-			fn preview(it: *Dcmliterator) ?[]const u8 {
-				if ( it.strbuf.len == 0 ) return null;
-
-				if (it.index == 0) return null;
-				const i = it.buf.len;
-				it.index -= getUTF8Size(it.buf[i]);
-				return it.buf[i..it.index];
-			}
 		};
 
 		/// iterator String
